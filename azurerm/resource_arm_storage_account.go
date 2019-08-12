@@ -945,7 +945,6 @@ func resourceArmStorageAccountRead(d *schema.ResourceData, meta interface{}) err
 	ctx := meta.(*ArmClient).StopContext
 	client := meta.(*ArmClient).storageServiceClient
 	advancedThreatProtectionClient := meta.(*ArmClient).securityCenter.AdvancedThreatProtectionClient
-	endpointSuffix := meta.(*ArmClient).environment.StorageEndpointSuffix
 
 	id, err := parseAzureResourceID(d.Id())
 	if err != nil {
@@ -963,12 +962,6 @@ func resourceArmStorageAccountRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error reading the state of AzureRM Storage Account %q: %+v", name, err)
 	}
 
-	keys, err := client.ListKeys(ctx, resGroup, name)
-	if err != nil {
-		return err
-	}
-
-	accessKeys := *keys.Keys
 	d.Set("name", resp.Name)
 	d.Set("resource_group_name", resGroup)
 	if location := resp.Location; location != nil {
@@ -1009,35 +1002,13 @@ func resourceArmStorageAccountRead(d *schema.ResourceData, meta interface{}) err
 		d.Set("primary_location", props.PrimaryLocation)
 		d.Set("secondary_location", props.SecondaryLocation)
 
-		if len(accessKeys) > 0 {
-			pcs := fmt.Sprintf("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=%s", *resp.Name, *accessKeys[0].Value, endpointSuffix)
-			d.Set("primary_connection_string", pcs)
-		}
-
-		if len(accessKeys) > 1 {
-			scs := fmt.Sprintf("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=%s", *resp.Name, *accessKeys[1].Value, endpointSuffix)
-			d.Set("secondary_connection_string", scs)
-		}
-
 		if err := flattenAndSetAzureRmStorageAccountPrimaryEndpoints(d, props.PrimaryEndpoints); err != nil {
 			return fmt.Errorf("error setting primary endpoints and hosts for blob, queue, table and file: %+v", err)
 		}
 
-		var primaryBlobConnectStr string
-		if v := props.PrimaryEndpoints; v != nil {
-			primaryBlobConnectStr = getBlobConnectionString(v.Blob, resp.Name, accessKeys[0].Value)
-		}
-		d.Set("primary_blob_connection_string", primaryBlobConnectStr)
-
 		if err := flattenAndSetAzureRmStorageAccountSecondaryEndpoints(d, props.SecondaryEndpoints); err != nil {
 			return fmt.Errorf("error setting secondary endpoints and hosts for blob, queue, table: %+v", err)
 		}
-
-		var secondaryBlobConnectStr string
-		if v := props.SecondaryEndpoints; v != nil {
-			secondaryBlobConnectStr = getBlobConnectionString(v.Blob, resp.Name, accessKeys[1].Value)
-		}
-		d.Set("secondary_blob_connection_string", secondaryBlobConnectStr)
 
 		if networkRules := props.NetworkRuleSet; networkRules != nil {
 			if err := d.Set("network_rules", flattenStorageAccountNetworkRules(networkRules)); err != nil {
@@ -1045,9 +1016,6 @@ func resourceArmStorageAccountRead(d *schema.ResourceData, meta interface{}) err
 			}
 		}
 	}
-
-	d.Set("primary_access_key", accessKeys[0].Value)
-	d.Set("secondary_access_key", accessKeys[1].Value)
 
 	identity := flattenAzureRmStorageAccountIdentity(resp.Identity)
 	if err := d.Set("identity", identity); err != nil {

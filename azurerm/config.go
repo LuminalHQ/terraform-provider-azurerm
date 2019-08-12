@@ -226,8 +226,9 @@ type ArmClient struct {
 	subscriptionsClient   subscriptions.Client
 
 	// Storage
-	storageServiceClient storage.AccountsClient
-	storageUsageClient   storage.UsagesClient
+	storageServiceClient       storage.AccountsClient
+	storageBlobContainerClient storage.BlobContainersClient
+	storageUsageClient         storage.UsagesClient
 }
 
 func (c *ArmClient) configureClient(client *autorest.Client, auth autorest.Authorizer) {
@@ -686,6 +687,10 @@ func (c *ArmClient) registerStorageClients(endpoint, subscriptionId string, auth
 	accountsClient := storage.NewAccountsClientWithBaseURI(endpoint, subscriptionId)
 	c.configureClient(&accountsClient.Client, auth)
 	c.storageServiceClient = accountsClient
+
+	blobContainerClient := storage.NewBlobContainersClientWithBaseURI(endpoint, subscriptionId)
+	c.configureClient(&blobContainerClient.Client, auth)
+	c.storageBlobContainerClient = blobContainerClient
 
 	usageClient := storage.NewUsagesClientWithBaseURI(endpoint, subscriptionId)
 	c.configureClient(&usageClient.Client, auth)

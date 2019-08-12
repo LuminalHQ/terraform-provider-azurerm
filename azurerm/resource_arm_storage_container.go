@@ -5,6 +5,7 @@ import (
 	"log"
 	"regexp"
 
+	newStorage "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2019-04-01/storage"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/azure"
@@ -88,6 +89,7 @@ func resourceArmStorageContainerCreate(d *schema.ResourceData, meta interface{})
 	metaData := storage.ExpandMetaData(metaDataRaw)
 
 	resourceGroup, err := storageClient.FindResourceGroup(ctx, accountName)
+
 	if err != nil {
 		return fmt.Errorf("Error locating Resource Group for Storage Container %q (Account %s): %s", containerName, accountName, err)
 	}
@@ -179,6 +181,7 @@ func resourceArmStorageContainerUpdate(d *schema.ResourceData, meta interface{})
 func resourceArmStorageContainerRead(d *schema.ResourceData, meta interface{}) error {
 	ctx := meta.(*ArmClient).StopContext
 	storageClient := meta.(*ArmClient).storage
+	client := meta.(*ArmClient).storageBlobContainerClient
 
 	id, err := containers.ParseResourceID(d.Id())
 	if err != nil {
@@ -195,14 +198,11 @@ func resourceArmStorageContainerRead(d *schema.ResourceData, meta interface{}) e
 		return nil
 	}
 
-	client, err := storageClient.ContainersClient(ctx, *resourceGroup, id.AccountName)
-	if err != nil {
-		return fmt.Errorf("Error building Containers Client for Storage Account %q (Resource Group %q): %s", id.AccountName, *resourceGroup, err)
-	}
+	container, err := client.Get(ctx, *resourceGroup, id.AccountName, id.ContainerName)
 
-	props, err := client.GetProperties(ctx, id.AccountName, id.ContainerName)
+	// props, err := client.GetProperties(ctx, id.AccountName, id.ContainerName)
 	if err != nil {
-		if utils.ResponseWasNotFound(props.Response) {
+		if utils.ResponseWasNotFound(container.Response) {
 			log.Printf("[DEBUG] Container %q was not found in Account %q / Resource Group %q - assuming removed & removing from state", id.ContainerName, id.AccountName, *resourceGroup)
 			d.SetId("")
 			return nil
@@ -215,18 +215,19 @@ func resourceArmStorageContainerRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("storage_account_name", id.AccountName)
 	d.Set("resource_group_name", resourceGroup)
 
-	d.Set("container_access_type", flattenStorageContainerAccessLevel(props.AccessLevel))
+	d.Set("container_access_type", flattenStorageContainerAccessLevel(container.PublicAccess))
 
-	if err := d.Set("metadata", storage.FlattenMetaData(props.MetaData)); err != nil {
-		return fmt.Errorf("Error setting `metadata`: %+v", err)
-	}
+	//TODO: Handle these fields
+	// if err := d.Set("metadata", storage.FlattenMetaData(container.Metadata)); err != nil {
+	// 	return fmt.Errorf("Error setting `metadata`: %+v", err)
+	// }
 
-	if err := d.Set("properties", flattenStorageContainerProperties(props)); err != nil {
-		return fmt.Errorf("Error setting `properties`: %+v", err)
-	}
+	// if err := d.Set("properties", flattenStorageContainerProperties(container.ContainerProperties)); err != nil {
+	// 	return fmt.Errorf("Error setting `properties`: %+v", err)
+	// }
 
-	d.Set("has_immutability_policy", props.HasImmutabilityPolicy)
-	d.Set("has_legal_hold", props.HasLegalHold)
+	d.Set("has_immutability_policy", container.HasImmutabilityPolicy)
+	d.Set("has_legal_hold", container.HasLegalHold)
 
 	return nil
 }
@@ -288,13 +289,16 @@ func expandStorageContainerAccessLevel(input string) containers.AccessLevel {
 	return containers.AccessLevel(input)
 }
 
-func flattenStorageContainerAccessLevel(input containers.AccessLevel) string {
-	// for historical reasons, "private" above is an empty string in the API
-	if input == containers.Private {
+func flattenStorageContainerAccessLevel(input newStorage.PublicAccess) string {
+	switch input {
+	case newStorage.PublicAccessBlob:
+		return "blob"
+	case newStorage.PublicAccessContainer:
+		return "container"
+	default:
 		return "private"
 	}
 
-	return string(input)
 }
 
 func validateArmStorageContainerName(v interface{}, k string) (warnings []string, errors []error) {
