@@ -482,9 +482,9 @@ func resourceArmApplicationGateway() *schema.Resource {
 						},
 
 						"capacity": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(1, 10),
+							Type:     schema.TypeInt,
+							Required: true,
+							//ValidateFunc: validation.IntBetween(1, 10),
 						},
 					},
 				},

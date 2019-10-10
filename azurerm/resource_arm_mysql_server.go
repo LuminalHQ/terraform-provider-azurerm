@@ -115,7 +115,7 @@ func resourceArmMySqlServer() *schema.Resource {
 
 			"administrator_login_password": {
 				Type:      schema.TypeString,
-				Required:  true,
+				Optional:  true,
 				Sensitive: true,
 			},
 

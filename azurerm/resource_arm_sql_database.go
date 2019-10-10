@@ -143,6 +143,7 @@ func resourceArmSqlDatabase() *schema.Resource {
 					string(sql.Basic),
 					string(sql.Standard),
 					string(sql.Premium),
+					string(sql.System),
 					string(sql.DataWarehouse),
 				}, true),
 			},

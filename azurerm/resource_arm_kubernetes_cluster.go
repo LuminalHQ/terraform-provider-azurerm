@@ -186,7 +186,7 @@ func resourceArmKubernetesCluster() *schema.Resource {
 							ForceNew:     true,
 							Required:     true,
 							Sensitive:    true,
-							ValidateFunc: validate.NoEmptyStrings,
+							//ValidateFunc: validate.NoEmptyStrings,
 						},
 					},
 				},
