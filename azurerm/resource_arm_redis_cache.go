@@ -130,9 +130,9 @@ func resourceArmRedisCache() *schema.Resource {
 							Optional: true,
 						},
 						"rdb_backup_frequency": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validateRedisBackupFrequency,
+							Type:     schema.TypeInt,
+							Optional: true,
+							//ValidateFunc: validateRedisBackupFrequency,
 						},
 						"rdb_backup_max_snapshot_count": {
 							Type:     schema.TypeInt,
