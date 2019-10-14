@@ -43,7 +43,7 @@ func resourceArmAutomationCredential() *schema.Resource {
 
 			"password": {
 				Type:      schema.TypeString,
-				Required:  true,
+				Optional:  true,
 				Sensitive: true,
 			},
 

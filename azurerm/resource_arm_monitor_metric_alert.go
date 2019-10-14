@@ -29,10 +29,10 @@ func resourceArmMonitorMetricAlert() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validate.NoEmptyStrings,
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				//ValidateFunc: validate.NoEmptyStrings,
 			},
 
 			"resource_group_name": resourceGroupNameSchema(),
@@ -42,9 +42,9 @@ func resourceArmMonitorMetricAlert() *schema.Resource {
 			// But to prevent potential state migration in the future, let's stick to use Set now
 			"scopes": {
 				Type:     schema.TypeSet,
-				Required: true,
-				MinItems: 1,
-				MaxItems: 1,
+				Optional: true,
+				//MinItems: 1,
+				//MaxItems: 1,
 				Elem: &schema.Schema{
 					Type:         schema.TypeString,
 					ValidateFunc: azure.ValidateResourceID,
@@ -54,8 +54,8 @@ func resourceArmMonitorMetricAlert() *schema.Resource {
 
 			"criteria": {
 				Type:     schema.TypeList,
-				Required: true,
-				MinItems: 1,
+				Optional: true,
+				//MinItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"metric_namespace": {
