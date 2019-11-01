@@ -50,20 +50,20 @@ func resourceArmSqlDatabase() *schema.Resource {
 			},
 
 			"create_mode": {
-				Type:             schema.TypeString,
-				Optional:         true,
-				Default:          string(sql.Default),
+				Type:     schema.TypeString,
+				Optional: true,
+				// Default:          string(sql.Default),
 				DiffSuppressFunc: suppress.CaseDifference,
-				ValidateFunc: validation.StringInSlice([]string{
-					string(sql.Copy),
-					string(sql.Default),
-					string(sql.NonReadableSecondary),
-					string(sql.OnlineSecondary),
-					string(sql.PointInTimeRestore),
-					string(sql.Recovery),
-					string(sql.Restore),
-					string(sql.RestoreLongTermRetentionBackup),
-				}, true),
+				// ValidateFunc: validation.StringInSlice([]string{
+				// 	string(sql.Copy),
+				// 	string(sql.Default),
+				// 	string(sql.NonReadableSecondary),
+				// 	string(sql.OnlineSecondary),
+				// 	string(sql.PointInTimeRestore),
+				// 	string(sql.Recovery),
+				// 	string(sql.Restore),
+				// 	string(sql.RestoreLongTermRetentionBackup),
+				// }, true),
 			},
 
 			"import": {

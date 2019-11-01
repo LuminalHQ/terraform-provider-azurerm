@@ -120,10 +120,10 @@ func resourceArmRedisCache() *schema.Resource {
 						},
 
 						"maxmemory_policy": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							Default:      "volatile-lru",
-							ValidateFunc: validateRedisMaxMemoryPolicy,
+							Type:     schema.TypeString,
+							Optional: true,
+							// Default:      "volatile-lru",
+							// ValidateFunc: validateRedisMaxMemoryPolicy,
 						},
 						"rdb_backup_enabled": {
 							Type:     schema.TypeBool,

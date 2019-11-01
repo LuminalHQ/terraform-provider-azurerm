@@ -152,7 +152,6 @@ func resourceArmMonitorMetricAlert() *schema.Resource {
 			"auto_mitigate": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 
 			"description": {
@@ -163,13 +162,11 @@ func resourceArmMonitorMetricAlert() *schema.Resource {
 			"enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
 			},
 
 			"frequency": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "PT1M",
 				ValidateFunc: validation.StringInSlice([]string{
 					"PT1M",
 					"PT5M",
@@ -182,14 +179,12 @@ func resourceArmMonitorMetricAlert() *schema.Resource {
 			"severity": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				Default:      3,
 				ValidateFunc: validation.IntBetween(0, 4),
 			},
 
 			"window_size": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "PT5M",
 				ValidateFunc: validation.StringInSlice([]string{
 					"PT1M",
 					"PT5M",

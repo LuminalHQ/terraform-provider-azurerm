@@ -703,22 +703,6 @@ func flattenContainerGroupContainers(d *schema.ResourceData, containers *[]conta
 				ports = append(ports, port)
 			}
 			containerConfig["ports"] = schema.NewSet(resourceArmContainerGroupPortsHash, ports)
-
-			//old deprecated code
-			containerPort := *(*cPorts)[0].Port
-			containerConfig["port"] = containerPort
-			// protocol isn't returned in container config, have to search in container group ports
-			protocol := ""
-			if containerGroupPorts != nil {
-				for _, cgPort := range *containerGroupPorts {
-					if *cgPort.Port == containerPort {
-						protocol = string(cgPort.Protocol)
-					}
-				}
-			}
-			if protocol != "" {
-				containerConfig["protocol"] = protocol
-			}
 		}
 
 		if container.EnvironmentVariables != nil {
