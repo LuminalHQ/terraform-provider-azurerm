@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/satori/uuid"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/azure"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/tf"
 
@@ -145,6 +145,7 @@ func resourceArmSqlDatabase() *schema.Resource {
 					string(sql.Premium),
 					string(sql.System),
 					string(sql.DataWarehouse),
+					string(sql.GeneralPurpose),
 				}, true),
 			},
 
