@@ -145,28 +145,6 @@ func resourceArmContainerGroup() *schema.Resource {
 							ForceNew: true,
 						},
 
-						"port": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ForceNew:     true,
-							Computed:     true,
-							Deprecated:   "Deprecated in favor of `ports`",
-							ValidateFunc: validate.PortNumber,
-						},
-
-						"protocol": {
-							Type:             schema.TypeString,
-							Optional:         true,
-							ForceNew:         true,
-							Computed:         true,
-							Deprecated:       "Deprecated in favor of `ports`",
-							DiffSuppressFunc: suppress.CaseDifference,
-							ValidateFunc: validation.StringInSlice([]string{
-								string(containerinstance.TCP),
-								string(containerinstance.UDP),
-							}, true),
-						},
-
 						"ports": {
 							Type:     schema.TypeSet,
 							Optional: true,
@@ -253,24 +231,24 @@ func resourceArmContainerGroup() *schema.Resource {
 									},
 
 									"share_name": {
-										Type:         schema.TypeString,
-										Required:     true,
-										ForceNew:     true,
-										ValidateFunc: validate.NoEmptyStrings,
+										Type:     schema.TypeString,
+										Optional: true,
+										ForceNew: true,
+										// ValidateFunc: validate.NoEmptyStrings,
 									},
 
 									"storage_account_name": {
-										Type:         schema.TypeString,
-										Required:     true,
-										ForceNew:     true,
-										ValidateFunc: validate.NoEmptyStrings,
+										Type:     schema.TypeString,
+										Optional: true,
+										ForceNew: true,
+										// ValidateFunc: validate.NoEmptyStrings,
 									},
 
 									"storage_account_key": {
-										Type:         schema.TypeString,
-										Required:     true,
-										ForceNew:     true,
-										ValidateFunc: validate.NoEmptyStrings,
+										Type:     schema.TypeString,
+										Optional: true,
+										ForceNew: true,
+										// ValidateFunc: validate.NoEmptyStrings,
 									},
 								},
 							},
