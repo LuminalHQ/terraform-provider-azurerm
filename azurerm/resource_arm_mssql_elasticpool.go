@@ -163,7 +163,7 @@ func resourceArmMsSqlElasticPool() *schema.Resource {
 				Optional: true,
 				Computed: true,
 				//ConflictsWith: []string{"max_size_gb"},
-				ValidateFunc: validation.IntAtLeast(0),
+				//ValidateFunc: validation.IntAtLeast(0),
 			},
 
 			"max_size_gb": {
@@ -171,7 +171,7 @@ func resourceArmMsSqlElasticPool() *schema.Resource {
 				Optional: true,
 				Computed: true,
 				//ConflictsWith: []string{"max_size_bytes"},
-				ValidateFunc: validate.FloatAtLeast(0),
+				//ValidateFunc: validate.FloatAtLeast(0),
 			},
 
 			"zone_redundant": {
