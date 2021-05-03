@@ -1183,13 +1183,16 @@ func resourceArmStorageAccountRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error retrieving Storage Account %q (Resource Group %q): `sku` was nil", name, resGroup)
 	}
 
+	log.Printf("[whc] about to get queue properties")
 	if resp.Sku.Tier == storage.Standard {
 		if resp.Kind == storage.Storage || resp.Kind == storage.StorageV2 {
 			queueClient, err := storageClient.QueuesClient(ctx, *account)
 			if err != nil {
+				log.Printf("[whc] Error creating queue client %s, ignoring the rest", err.Error())
 				// queues client requires listing keys, so we ignore errors
 				// return fmt.Errorf("Error building Queues Client: %s", err)
 			} else {
+				log.Printf("[whc] Trying to get queue properties")
 				queueProps, err := queueClient.GetServiceProperties(ctx, name)
 				if err != nil {
 					if queueProps.Response.Response != nil && !utils.ResponseWasNotFound(queueProps.Response) {
