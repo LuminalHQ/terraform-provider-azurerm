@@ -1407,8 +1407,19 @@ func flattenAzureRmVirtualMachineScaleSetNetworkProfile(profile *compute.Virtual
 func flattenAzureRMVirtualMachineScaleSetOsProfile(d *schema.ResourceData, profile *compute.VirtualMachineScaleSetOSProfile) []interface{} {
 	result := make(map[string]interface{})
 
-	result["computer_name_prefix"] = *profile.ComputerNamePrefix
-	result["admin_username"] = *profile.AdminUsername
+	// Let's hardcode some strings. Those fields only show up in tfstate file and are not used.
+	// They should never be empty... but they are for some customers.
+	if profile.ComputerNamePrefix != nil {
+		result["computer_name_prefix"] = *profile.ComputerNamePrefix
+	} else {
+		result["computer_name_prefix"] = "vm"
+	}
+
+	if profile.AdminUsername != nil {
+		result["admin_username"] = *profile.AdminUsername
+	} else {
+		result["admin_username"] = "azureuser"
+	}
 
 	// admin password isn't returned, so let's look it up
 	if v, ok := d.GetOk("os_profile.0.admin_password"); ok {
