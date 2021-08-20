@@ -1409,9 +1409,13 @@ func flattenAzureRMVirtualMachineScaleSetOsProfile(d *schema.ResourceData, profi
 
 	if profile.ComputerNamePrefix != nil {
 		result["computer_name_prefix"] = *profile.ComputerNamePrefix
+	} else {
+		result["computer_name_prefix"] = ""
 	}
 	if profile.AdminUsername != nil {
 		result["admin_username"] = *profile.AdminUsername
+	} else {
+		result["admin_username"] = ""
 	}
 
 	// admin password isn't returned, so let's look it up
