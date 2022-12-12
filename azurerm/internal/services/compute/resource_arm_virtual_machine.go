@@ -48,8 +48,9 @@ func userDataStateFunc(v interface{}) string {
 }
 
 // NOTE: the `azurerm_virtual_machine` resource has been superseded by the `azurerm_linux_virtual_machine` and
-// 		 `azurerm_windows_virtual_machine` resources - as such this resource is feature-frozen and new
-//		 functionality will be added to these new resources instead.
+//
+//	`azurerm_windows_virtual_machine` resources - as such this resource is feature-frozen and new
+//	functionality will be added to these new resources instead.
 func resourceArmVirtualMachine() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceArmVirtualMachineCreateUpdate,
@@ -849,7 +850,7 @@ func resourceArmVirtualMachineRead(d *schema.ResourceData, meta interface{}) err
 			}
 
 			if osDisk := profile.OsDisk; osDisk != nil {
-				diskInfo, err := resourceArmVirtualMachineGetManagedDiskInfo(d, osDisk.ManagedDisk, meta)
+				diskInfo, err := resourceArmVirtualMachineGetManagedDiskInfo(d, osDisk.ManagedDisk, meta, osDisk)
 				if err != nil {
 					return fmt.Errorf("Error flattening `storage_os_disk`: %#v", err)
 				}
@@ -861,7 +862,7 @@ func resourceArmVirtualMachineRead(d *schema.ResourceData, meta interface{}) err
 			if dataDisks := profile.DataDisks; dataDisks != nil {
 				disksInfo := make([]*compute.Disk, len(*dataDisks))
 				for i, dataDisk := range *dataDisks {
-					diskInfo, err := resourceArmVirtualMachineGetManagedDiskInfo(d, dataDisk.ManagedDisk, meta)
+					diskInfo, err := resourceArmVirtualMachineGetManagedDiskInfo(d, dataDisk.ManagedDisk, meta, nil)
 					if err != nil {
 						return fmt.Errorf("[DEBUG] Error getting managed data disk detailed information: %#v", err)
 					}
@@ -1962,7 +1963,7 @@ func resourceArmVirtualMachineStorageImageReferenceHash(v interface{}) int {
 	return hashcode.String(buf.String())
 }
 
-func resourceArmVirtualMachineGetManagedDiskInfo(d *schema.ResourceData, disk *compute.ManagedDiskParameters, meta interface{}) (*compute.Disk, error) {
+func resourceArmVirtualMachineGetManagedDiskInfo(d *schema.ResourceData, disk *compute.ManagedDiskParameters, meta interface{}, osDisk *compute.OSDisk) (*compute.Disk, error) {
 	client := meta.(*clients.Client).Compute.DisksClient
 	ctx, cancel := timeouts.ForRead(meta.(*clients.Client).StopContext, d)
 	defer cancel()
@@ -1981,7 +1982,14 @@ func resourceArmVirtualMachineGetManagedDiskInfo(d *schema.ResourceData, disk *c
 	name := id.Path["disks"]
 	diskResp, err := client.Get(ctx, resourceGroup, name)
 	if err != nil {
-		return nil, fmt.Errorf("Error retrieving Disk %q (Resource Group %q): %+v", name, resourceGroup, err)
+		if utils.ResponseWasNotFound(diskResp.Response) && osDisk != nil {
+			diskRet := compute.Disk{
+				Name: osDisk.Name,
+			}
+			return &diskRet, nil
+		} else {
+			return nil, fmt.Errorf("Error retrieving Disk %q (Resource Group %q): %+v", name, resourceGroup, err)
+		}
 	}
 
 	return &diskResp, nil
