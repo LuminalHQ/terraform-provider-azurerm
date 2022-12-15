@@ -4,6 +4,8 @@ require (
 	github.com/Azure/azure-sdk-for-go v39.3.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.9.3
 	github.com/Azure/go-autorest/autorest/date v0.2.0
+	github.com/Azure/go-autorest/autorest/validation v0.2.0
+	github.com/Azure/go-autorest/tracing v0.5.0
 	github.com/btubbs/datetime v0.1.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/fugue/tfratelimiter v0.0.0-00010101000000-000000000000
