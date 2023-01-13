@@ -51,4 +51,5 @@ tf.zip
 # do not upload secrets
 .env
 tmp/
-
+*.orig
+/debug
