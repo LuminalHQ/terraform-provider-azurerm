@@ -108,8 +108,6 @@ func resourceArmStorageAccountNetworkRulesCreateUpdate(d *schema.ResourceData, m
 
 	locks.ByName(storageAccountName, storageAccountResourceName)
 	defer locks.UnlockByName(storageAccountName, storageAccountResourceName)
-
-	fmt.Println("resourceArmStorageAccountNetworkRulesRead - d", d, "meta", meta,  "resourceGroup", resourceGroup, "storageAccountName", storageAccountName)
 	storageAccount, err := client.GetProperties(ctx, resourceGroup, storageAccountName, "")
 	if err != nil {
 		if utils.ResponseWasNotFound(storageAccount.Response) {
@@ -178,7 +176,7 @@ func resourceArmStorageAccountNetworkRulesRead(d *schema.ResourceData, meta inte
 
 	storageAccount, err := client.GetProperties(ctx, resourceGroup, storageAccountName, "")
 	if err != nil {
-		return fmt.Errorf("Error reading Storage Account Network Rules %q (Resource Group %q): %+v", storageAccountName, resourceGroup, err)
+		return fmt.Errorf("id", id, "resourceArmStorageAccountNetworkRulesRead - d", d, "meta", meta, "Error reading Storage Account Network Rules %q (Resource Group %q): %+v", storageAccountName, resourceGroup, err)
 	}
 
 	d.Set("storage_account_name", storageAccountName)
