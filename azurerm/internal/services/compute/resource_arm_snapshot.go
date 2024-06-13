@@ -1,6 +1,7 @@
 package compute
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"regexp"
@@ -167,7 +168,7 @@ func resourceArmSnapshotCreateUpdate(d *schema.ResourceData, meta interface{}) e
 
 func resourceArmSnapshotRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*clients.Client).Compute.SnapshotsClient
-	ctx, cancel := timeouts.ForRead(meta.(*clients.Client).StopContext, d)
+	ctx, cancel := context.WithTimeout(meta.(*clients.Client).StopContext, 30*time.Second)
 	defer cancel()
 
 	id, err := azure.ParseAzureResourceID(d.Id())

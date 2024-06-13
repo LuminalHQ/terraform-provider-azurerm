@@ -1,13 +1,13 @@
 package compute
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/helpers/azure"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/clients"
-	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/timeouts"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/utils"
 )
 
@@ -109,7 +109,7 @@ func dataSourceArmSnapshot() *schema.Resource {
 
 func dataSourceArmSnapshotRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*clients.Client).Compute.SnapshotsClient
-	ctx, cancel := timeouts.ForRead(meta.(*clients.Client).StopContext, d)
+	ctx, cancel := context.WithTimeout(meta.(*clients.Client).StopContext, 30*time.Second)
 	defer cancel()
 
 	resourceGroup := d.Get("resource_group_name").(string)
